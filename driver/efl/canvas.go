@@ -247,15 +247,18 @@ func (c *eflCanvas) buildContainer(parent fyne.CanvasObject, target fyne.CanvasO
 	}
 }
 
-func renderImagePortion(img *canvas.Image, pixels []uint32, wg *sync.WaitGroup,
-	startx, starty, width, height, imgWidth, imgHeight int) {
-	defer wg.Done()
+func (c *eflCanvas) renderImage(img *canvas.Image, x, y, width, height int) {
+	if width <= 0 || height <= 0 {
+		return
+	}
 
-	// calculate image pixels
-	i := startx + starty*imgWidth
-	for y := starty; y < starty+height; y++ {
-		for x := startx; x < startx+width; x++ {
-			col := img.PixelColor(x, y, imgWidth, imgHeight)
+	raw := img.Raster(width, height)
+	pixels := make([]uint32, width*height)
+
+	i := 0
+	for y := 0; y < height; y++ {
+		for x := 0; x < width; x++ {
+			col := raw.At(x, y)
 
 			// convert from the 16 bit-per-channel RGBA to an 8 bit-per-channel ARGB
 			r, g, b, a := col.RGBA()
@@ -264,29 +267,7 @@ func renderImagePortion(img *canvas.Image, pixels []uint32, wg *sync.WaitGroup,
 				((uint32)(rgba.G) << 8) | (uint32)(rgba.B))
 			i++
 		}
-		i += imgWidth - width
 	}
-}
-
-func (c *eflCanvas) renderImage(img *canvas.Image, x, y, width, height int) {
-	if width <= 0 || height <= 0 {
-		return
-	}
-
-	pixels := make([]uint32, width*height)
-
-	// Spawn 4 threads each calculating the pixels for a quadrant of the image
-	halfWidth := width / 2
-	halfHeight := height / 2
-
-	// use a WaitGroup so we don't render our pixels before they are ready
-	var wg sync.WaitGroup
-	wg.Add(4)
-	go renderImagePortion(img, pixels, &wg, 0, 0, halfWidth, halfHeight, width, height)
-	go renderImagePortion(img, pixels, &wg, halfWidth, 0, width-halfWidth, halfHeight, width, height)
-	go renderImagePortion(img, pixels, &wg, 0, halfHeight, halfWidth, height-halfHeight, width, height)
-	go renderImagePortion(img, pixels, &wg, halfWidth, halfHeight, width-halfWidth, height-halfHeight, width, height)
-	wg.Wait()
 
 	// write pixels to canvas
 	obj := c.native[img]
@@ -380,7 +361,7 @@ func (c *eflCanvas) refreshObject(o, o2 fyne.CanvasObject) {
 		if co.File != "" || co.Resource != nil {
 			c.loadImage(co, obj)
 		}
-		if co.PixelColor != nil {
+		if co.Raster != nil {
 			C.evas_object_image_size_set(obj, C.int(width), C.int(height))
 
 			c.renderImage(co, 0, 0, width, height)
