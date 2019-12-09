@@ -1,0 +1,29 @@
+// Package theme defines how a Fyne app should look when rendered
+package theme // import "fyne.io/fyne/theme"
+
+import (
+	"fyne.io/fyne"
+	"image/color"
+)
+
+// LightTheme defines the built in light theme colours and sizes
+func SghLightTheme() fyne.Theme {
+	theme := &builtinTheme{
+		background:     color.RGBA{0xf5, 0xff, 0xfa, 0xff},
+		button:         color.RGBA{0xd9, 0xd9, 0xd9, 0xff},
+		disabledButton: color.RGBA{0xe7, 0xe7, 0xe7, 0xff},
+		text:           color.RGBA{0x0, 0x0, 0x0, 0xff},
+		disabledText:   color.RGBA{0x80, 0x80, 0x80, 0xff},
+		icon:           color.RGBA{0x21, 0x21, 0x21, 0xff},
+		disabledIcon:   color.RGBA{0x80, 0x80, 0x80, 0xff},
+		hyperlink:      color.RGBA{0x0, 0x0, 0xd9, 0xff},
+		placeholder:    color.RGBA{0x88, 0x88, 0x88, 0xff},
+		primary:        color.RGBA{0x9f, 0xa8, 0xda, 0xff},
+		hover:          color.RGBA{0xe7, 0xe7, 0xe7, 0xff},
+		scrollBar:      color.RGBA{0x0, 0x0, 0x0, 0x99},
+		shadow:         color.RGBA{0x0, 0x0, 0x0, 0x33},
+	}
+
+	theme.initFonts()
+	return theme
+}

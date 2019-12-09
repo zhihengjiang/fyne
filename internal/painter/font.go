@@ -12,7 +12,7 @@ import (
 )
 
 // TextDPI is a global constant that determines how text scales to interface sizes
-const TextDPI = 78
+const TextDPI = 68
 
 func loadFont(data fyne.Resource) *truetype.Font {
 	loaded, err := truetype.Parse(data.Content())
