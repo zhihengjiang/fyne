@@ -1,8 +1,11 @@
 package fyne
 
+import "github.com/go-gl/glfw/v3.2/glfw"
+
 // Window describes a user interface window. Depending on the platform an app
 // may have many windows or just the one.
 type Window interface {
+	GetSghGlfwWindow() *glfw.Window
 	// Title returns the current window title.
 	// This is typically displayed in the window decorations.
 	Title() string

@@ -55,3 +55,7 @@ func (d *gLDriver) CreateSghWindow(title string, borderless bool) fyne.Window {
 	})
 	return ret
 }
+
+func (w *window) GetSghGlfwWindow() *glfw.Window {
+	return w.viewport
+}

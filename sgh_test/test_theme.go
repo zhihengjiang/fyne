@@ -35,14 +35,37 @@ func CreateWin(title string, borderless bool) fyne.Window {
 	return createWinCore(title, borderless)
 }
 
+func centerOnScreen(w fyne.Window) {
+
+	viewWidth, viewHeight := w.GetSghGlfwWindow().GetSize()
+
+	// get window dimensions in pixels
+	monitor := w.GetSghGlfwWindow().GetMonitor()
+	if monitor == nil {
+		return
+	}
+	monMode := monitor.GetVideoMode()
+
+	// these come into play when dealing with multiple monitors
+	monX, monY := monitor.GetPos()
+
+	// math them to the middle
+	newX := (monMode.Width / 2) - (viewWidth / 2) + monX
+	newY := (monMode.Height / 2) - (viewHeight / 2) + monY
+
+	// set new window coordinates
+	w.GetSghGlfwWindow().SetPos(newX, newY)
+}
+
 func createWinCore(title string, borderless bool) fyne.Window {
 	w := app.Driver().CreateSghWindow(title, borderless)
-	w.CenterOnScreen()
+	//w.CenterOnScreen()
 	w.SetFixedSize(true)
 	return w
 }
 
 func (w *win) Exit() {
+	app.Quit()
 	os.Exit(0)
 }
 
@@ -66,8 +89,14 @@ func (w *win) show(borderless bool) {
 	if w.bfw == nil {
 		w.initWin(true)
 	}
+
 	w.borderless = borderless
 	if borderless {
+		x1, y1 := w.fw.GetSghGlfwWindow().GetPos()
+		x2, y2 := w.bfw.GetSghGlfwWindow().GetPos()
+		if x1 != x2 || y1 != y2 {
+			w.bfw.GetSghGlfwWindow().SetPos(x1, y1)
+		}
 		w.fw.Hide()
 		w.bfw.Show()
 	} else {
@@ -93,7 +122,7 @@ func main() {
 	w := NewWin()
 	go func() {
 		for {
-			time.Sleep(time.Second * 3)
+			time.Sleep(time.Second * 5)
 			fmt.Printf("\r\nnow setting borderless %t", !w.borderless)
 			w.SetBorderless(!w.borderless)
 		}
