@@ -3,6 +3,7 @@ package fyne
 // Driver defines an abstract concept of a Fyne render driver.
 // Any implementation must provide at least these methods.
 type Driver interface {
+	CreateSghWindow(string, bool) Window
 	// Create a new UI Window.
 	CreateWindow(string) Window
 	// Get a slice containing all app windows.
