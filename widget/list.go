@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"fyne.io/fyne"
+	"fyne.io/fyne/binding"
 	"fyne.io/fyne/canvas"
 	"fyne.io/fyne/driver/desktop"
 	"fyne.io/fyne/internal/widget"
@@ -42,6 +43,32 @@ func NewList(length func() int, createItem func() fyne.CanvasObject, updateItem 
 	list := &List{BaseWidget: BaseWidget{}, Length: length, CreateItem: createItem, UpdateItem: updateItem}
 	list.ExtendBaseWidget(list)
 	return list
+}
+
+// NewListWithData creates a new list widget that will display the contents of the provided data.
+func NewListWithData(data binding.DataList, createItem func() fyne.CanvasObject, updateItem func(binding.DataItem, fyne.CanvasObject)) *List {
+	var l *List
+	itemListener := binding.NewDataItemListener(func(_ binding.DataItem) {
+		l.Refresh()
+	})
+	l = NewList(
+		func() int {
+			return data.Length()
+		},
+		createItem,
+		func(i ListItemID, o fyne.CanvasObject) {
+			item := data.GetItem(i)
+			updateItem(item, o)
+
+			// TODO we should remove this when it is re-used but for now it will just avoid duplication
+			item.RemoveListener(itemListener)
+			item.AddListener(itemListener)
+		})
+
+	data.AddListener(binding.NewDataListListener(func(_ binding.DataList) {
+		l.Refresh()
+	}))
+	return l
 }
 
 // CreateRenderer is a private method to Fyne which links this widget to its renderer.
