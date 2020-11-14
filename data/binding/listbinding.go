@@ -11,20 +11,20 @@ type DataList interface {
 // DataListListener is any object that can register for changes in a bindable DataItem.
 // See NewDataListListener to define a new listener using just an inline function.
 type DataListListener interface {
-	DataChanged(DataList)
+	DataChanged()
 }
 
 // NewDataListListener is a helper function that creates a new listener type from a list callback function.
-func NewDataListListener(fn func(DataList)) DataListListener {
+func NewDataListListener(fn func()) DataListListener {
 	return &listListener{fn}
 }
 
 type listListener struct {
-	callback func(DataList)
+	callback func()
 }
 
-func (l *listListener) DataChanged(i DataList) {
-	l.callback(i)
+func (l *listListener) DataChanged() {
+	l.callback()
 }
 
 type listBase struct {
@@ -74,6 +74,6 @@ func (b *listBase) appendItem(i DataItem) {
 
 func (b *listBase) trigger() {
 	for _, listen := range b.listeners {
-		listen.DataChanged(b)
+		queueItem(listen.DataChanged)
 	}
 }

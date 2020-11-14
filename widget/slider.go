@@ -4,8 +4,9 @@ import (
 	"math"
 
 	"fyne.io/fyne"
-	"fyne.io/fyne/binding"
 	"fyne.io/fyne/canvas"
+	"fyne.io/fyne/data/binding"
+	"fyne.io/fyne/internal/cache"
 	"fyne.io/fyne/internal/widget"
 	"fyne.io/fyne/theme"
 )
@@ -50,11 +51,11 @@ func NewSlider(min, max float64) *Slider {
 // NewSliderWithData returns a slider connected with the specified data source.
 func NewSliderWithData(min, max float64, data binding.Float) *Slider {
 	slider := NewSlider(min, max)
-	slider.Value = data.Get()
-
-	data.AddListener(binding.NewDataItemListener(func(binding.DataItem) {
+	data.AddListener(binding.NewDataItemListener(func() {
 		slider.Value = data.Get()
-		slider.Refresh()
+		if cache.IsRendered(slider) { // don't invalidate values set after constructor like Step
+			slider.Refresh()
+		}
 	}))
 	slider.OnChanged = func(f float64) {
 		data.Set(f)

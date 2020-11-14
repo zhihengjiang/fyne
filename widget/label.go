@@ -4,7 +4,7 @@ import (
 	"image/color"
 
 	"fyne.io/fyne"
-	"fyne.io/fyne/binding"
+	"fyne.io/fyne/data/binding"
 	"fyne.io/fyne/theme"
 )
 
@@ -27,7 +27,7 @@ func NewLabel(text string) *Label {
 func NewLabelWithData(data binding.String) *Label {
 	label := NewLabel(data.Get())
 
-	data.AddListener(binding.NewDataItemListener(func(binding.DataItem) {
+	data.AddListener(binding.NewDataItemListener(func() {
 		label.Text = data.Get()
 		label.Refresh()
 	}))

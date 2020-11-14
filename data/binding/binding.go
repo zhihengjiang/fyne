@@ -1,41 +1,64 @@
+//go:generate go run gen.go
+
 package binding
+
+import "sync"
 
 // DataItem is the base interface for all bindable data items.
 type DataItem interface {
+	// AddListener attaches a new change listener to this DataItem.
+	// Listeners are called each time the data inside this DataItem changes.
+	// Additionally the listener will be triggered upon successful connection to get the current value.
 	AddListener(DataItemListener)
+	// RemoveListener will detach the specified change listener from the DataItem.
+	// Disconnected listener will no longer be triggered when changes occur.
 	RemoveListener(DataItemListener)
 }
 
 // DataItemListener is any object that can register for changes in a bindable DataItem.
 // See NewDataItemListener to define a new listener using just an inline function.
 type DataItemListener interface {
-	DataChanged(DataItem)
+	DataChanged()
 }
 
 // NewDataItemListener is a helper function that creates a new listener type from a simple callback function.
-func NewDataItemListener(fn func(DataItem)) DataItemListener {
+func NewDataItemListener(fn func()) DataItemListener {
 	return &listener{fn}
 }
 
 type listener struct {
-	callback func(DataItem)
+	callback func()
 }
 
-func (l *listener) DataChanged(i DataItem) {
-	l.callback(i)
+func (l *listener) DataChanged() {
+	l.callback()
 }
 
 type base struct {
 	listeners []DataItemListener
+	lock      sync.RWMutex
 }
 
 // AddListener allows a data listener to be informed of changes to this item.
 func (b *base) AddListener(l DataItemListener) {
+	b.lock.Lock()
+	defer b.lock.Unlock()
+
+	for _, listen := range b.listeners { // TODO maybe fix? workaround for list not being able to de-register
+		if listen == l {
+			return
+		}
+	}
+
 	b.listeners = append(b.listeners, l)
+	queueItem(l.DataChanged)
 }
 
 // RemoveListener should be called if the listener is no longer interested in being informed of data change events.
 func (b *base) RemoveListener(l DataItemListener) {
+	b.lock.Lock()
+	defer b.lock.Unlock()
+
 	for i, listen := range b.listeners {
 		if listen != l {
 			continue
@@ -49,8 +72,11 @@ func (b *base) RemoveListener(l DataItemListener) {
 	}
 }
 
-func (b *base) trigger(i DataItem) {
+func (b *base) trigger() {
+	b.lock.RLock()
+	defer b.lock.RUnlock()
+
 	for _, listen := range b.listeners {
-		listen.DataChanged(i)
+		queueItem(listen.DataChanged)
 	}
 }
