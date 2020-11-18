@@ -51,7 +51,8 @@ func NewSlider(min, max float64) *Slider {
 // NewSliderWithData returns a slider connected with the specified data source.
 func NewSliderWithData(min, max float64, data binding.Float) *Slider {
 	slider := NewSlider(min, max)
-	data.AddListener(binding.NewDataItemListener(func() {
+
+	data.AddListener(binding.NewDataListener(func() {
 		slider.Value = data.Get()
 		if cache.IsRendered(slider) { // don't invalidate values set after constructor like Step
 			slider.Refresh()

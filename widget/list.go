@@ -46,7 +46,7 @@ func NewList(length func() int, createItem func() fyne.CanvasObject, updateItem 
 // NewListWithData creates a new list widget that will display the contents of the provided data.
 func NewListWithData(data binding.DataList, createItem func() fyne.CanvasObject, updateItem func(binding.DataItem, fyne.CanvasObject)) *List {
 	var l *List
-	itemListener := binding.NewDataItemListener(func() {
+	itemListener := binding.NewDataListener(func() {
 		l.Refresh()
 	})
 
