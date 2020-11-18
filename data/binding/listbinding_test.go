@@ -15,7 +15,7 @@ func TestListBase_AddListener(t *testing.T) {
 	assert.Equal(t, 0, len(data.listeners))
 
 	called := false
-	fn := NewDataListListener(func() {
+	fn := NewDataListener(func() {
 		called = true
 	})
 	data.AddListener(fn)
@@ -45,11 +45,11 @@ func TestListBase_Length(t *testing.T) {
 
 func TestListBase_RemoveListener(t *testing.T) {
 	called := false
-	fn := NewDataListListener(func() {
+	fn := NewDataListener(func() {
 		called = true
 	})
 	data := &simpleList{}
-	data.listeners = []DataListListener{fn}
+	data.listeners = []DataListener{fn}
 
 	assert.Equal(t, 1, len(data.listeners))
 	data.RemoveListener(fn)
@@ -62,7 +62,7 @@ func TestListBase_RemoveListener(t *testing.T) {
 
 func TestNewDataListListener(t *testing.T) {
 	called := false
-	fn := NewDataListListener(func() {
+	fn := NewDataListener(func() {
 		called = true
 	})
 

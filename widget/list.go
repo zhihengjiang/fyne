@@ -64,7 +64,7 @@ func NewListWithData(data binding.DataList, createItem func() fyne.CanvasObject,
 			item.AddListener(itemListener)
 		})
 
-	data.AddListener(binding.NewDataListListener(func() {
+	data.AddListener(binding.NewDataListener(func() {
 		l.Refresh()
 	}))
 	return l
