@@ -31,3 +31,9 @@ func (b *listBase) appendItem(i DataItem) {
 
 	b.trigger()
 }
+
+func (b *listBase) prependItem(i DataItem) {
+	b.val = append([]DataItem{i}, b.val...)
+
+	b.trigger()
+}

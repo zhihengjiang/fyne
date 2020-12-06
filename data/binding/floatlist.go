@@ -6,6 +6,8 @@ type FloatList interface {
 
 	Append(float64)
 	Get(int) float64
+	Prepend(float64)
+	Set(int, float64)
 }
 
 // NewFloatList returns a bindable list of string values.
@@ -27,4 +29,16 @@ func (f *floatListBind) Get(i int) float64 {
 	}
 
 	return f.GetItem(i).(Float).Get()
+}
+
+func (f *floatListBind) Prepend(val float64) {
+	f.prependItem(BindFloat(&val))
+}
+
+func (f *floatListBind) Set(i int, v float64) {
+	if i > f.Length() {
+		return
+	}
+
+	f.GetItem(i).(Float).Set(v)
 }
