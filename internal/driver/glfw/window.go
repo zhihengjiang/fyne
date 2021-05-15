@@ -97,6 +97,10 @@ type window struct {
 	pending    []func()
 }
 
+func (w *window) GetGlfwWindow() *glfw.Window {
+	return w.viewport
+}
+
 func (w *window) Title() string {
 	return w.title
 }

@@ -2,6 +2,7 @@ package test
 
 import (
 	"fyne.io/fyne/v2"
+	"github.com/go-gl/glfw/v3.3/glfw"
 )
 
 type testWindow struct {
@@ -23,6 +24,9 @@ func NewWindow(content fyne.CanvasObject) fyne.Window {
 	window := fyne.CurrentApp().NewWindow("")
 	window.SetContent(content)
 	return window
+}
+func (w *testWindow) GetGlfwWindow() *glfw.Window {
+	return nil
 }
 
 func (w *testWindow) Canvas() fyne.Canvas {
