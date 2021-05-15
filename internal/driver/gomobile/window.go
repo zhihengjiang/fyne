@@ -8,6 +8,7 @@ import (
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+	"github.com/go-gl/glfw/v3.3/glfw"
 )
 
 type window struct {
@@ -23,6 +24,10 @@ type window struct {
 	canvas    *mobileCanvas
 	icon      fyne.Resource
 	menu      *fyne.MainMenu
+}
+
+func (w *window) GetGlfwWindow() *glfw.Window {
+	return nil
 }
 
 func (w *window) Title() string {
